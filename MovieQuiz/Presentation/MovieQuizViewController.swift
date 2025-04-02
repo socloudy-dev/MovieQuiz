@@ -1,51 +1,8 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController {
-    private var currentQuestionIndex = 0
-    private var correctAnswers = 0
     
-    private let questions: [QuizQuestion] = [
-        QuizQuestion(
-            image: "The Godfather",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "The Dark Knight",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "Kill Bill",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "Deadpool",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "Old",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false),
-        QuizQuestion(
-            image: "The Ice Age Adventures of Buck Wild",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false),
-        QuizQuestion(
-            image: "Tesla",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false),
-        QuizQuestion(
-            image: "Vivarium",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false),
-        QuizQuestion(
-            image: "The Green Knight",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "The Avengers",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-    ]
+    //MARK: - Properties
     
     @IBOutlet private weak var yesButton: UIButton!
     @IBOutlet private weak var noButton: UIButton!
@@ -54,44 +11,34 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private weak var previewOfPosterImageView: UIImageView!
     @IBOutlet private weak var counterOfQuestionLabel: UILabel!
     
+    private var currentQuestionIndex = 0
+    private var correctAnswers = 0
+    private let questions = QuizQuestionMock.questions
+    
+    //MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        initAndShow()
+        displayCurrentQuestion()
     }
     
-    private struct QuizStepViewModel {
-        let image: UIImage
-        let question: String
-        let questionNumber: String
-    }
+    // MARK: - Setup Methods
     
-    private struct QuizResultsViewModel {
-        let title: String
-        let text: String
-        let buttonText: String
-    }
-    
-    private struct QuizQuestion {
-        let image: String
-        let text: String
-        let correctAnswer: Bool
-    }
-    
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
+    private func convert(model: QuizQuestion) -> QuizStepModel {
+        let questionStep = QuizStepModel(
             image: UIImage(named: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
         return questionStep
     }
     
-    private func show(quiz step: QuizStepViewModel) {
+    private func show(quiz step: QuizStepModel) {
         previewOfPosterImageView.image = step.image
         questionLabel.text = step.question
         counterOfQuestionLabel.text = step.questionNumber
     }
     
-    private func initAndShow() {
+    private func displayCurrentQuestion() {
         let currentQuestion = questions[currentQuestionIndex]
         let currentQuestionConverted = convert(model: currentQuestion)
         
@@ -123,7 +70,7 @@ final class MovieQuizViewController: UIViewController {
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questions.count - 1 {
-            let quizResults = QuizResultsViewModel(
+            let quizResults = QuizResultsModel(
                 title: "Этот раунд окончен!",
                 text: "Ваш результат: \(correctAnswers)/\(questions.count)",
                 buttonText: "Сыграть ещё раз")
@@ -139,7 +86,7 @@ final class MovieQuizViewController: UIViewController {
         }
     }
     
-    private func showQuizResults(quiz result: QuizResultsViewModel) {
+    private func showQuizResults(quiz result: QuizResultsModel) {
         let alert = UIAlertController(title: result.title,
                                       message: result.text,
                                       preferredStyle: .alert)
@@ -148,27 +95,25 @@ final class MovieQuizViewController: UIViewController {
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             
-            self.initAndShow()
+            self.displayCurrentQuestion()
         }
         
         alert.addAction(action)
-        
         self.present(alert, animated: true, completion: nil)
     }
     
-    @IBAction private func noButtonClicked(_ sender: UIButton) {
+    private func processAnswer(_ givenAnswer: Bool) {
         let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer = false
-        
-        
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
+    //MARK: - Actions
+    
+    @IBAction private func noButtonClicked(_ sender: UIButton) {
+        processAnswer(false)
+    }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer = true
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        processAnswer(true)
     }
 }
