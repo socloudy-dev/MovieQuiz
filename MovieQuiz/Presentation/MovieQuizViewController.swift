@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //MARK: - Properties
     
@@ -13,13 +13,35 @@ final class MovieQuizViewController: UIViewController {
     
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
-    private let questions = QuizQuestionMock.questions
+    private var questionsAmount = 10
+    private var questionFactory: QuestionFactoryProtocol?
+    private var currentQuestion: QuizQuestion?
     
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let questionFactory = QuestionFactory()
+        questionFactory.delegate = self
+        self.questionFactory = questionFactory
+        
+        questionFactory.requestNextQuestion()
         displayCurrentQuestion()
+    }
+    
+    //MARK: - QuestionFactoryDelegate
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question else {
+            return
+        }
+        
+        currentQuestion = question
+        let currentQuestionConverted = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.show(quiz: currentQuestionConverted)
+        }
     }
     
     // MARK: - Setup Methods
@@ -28,7 +50,7 @@ final class MovieQuizViewController: UIViewController {
         let questionStep = QuizStepModel(
             image: UIImage(named: model.image) ?? UIImage(),
             question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return questionStep
     }
     
@@ -39,7 +61,9 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func displayCurrentQuestion() {
-        let currentQuestion = questions[currentQuestionIndex]
+        //if let firstQuestion = questionFactory.requestNextQuestion() {
+        //self.currentQuestion = firstQuestion
+        guard let currentQuestion else { return }
         let currentQuestionConverted = convert(model: currentQuestion)
         
         show(quiz: currentQuestionConverted)
@@ -52,59 +76,80 @@ final class MovieQuizViewController: UIViewController {
         
         buttonsStackView.isUserInteractionEnabled = false
         
-        UIView.animate(withDuration: 0.2) {
-            self.previewOfPosterImageView.layer.masksToBounds = true
-            self.previewOfPosterImageView.layer.borderWidth = 8
-            self.previewOfPosterImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            UIView.animate(withDuration: 0.2) {
-                self.showNextQuestionOrResults()
-                self.previewOfPosterImageView.layer.borderWidth = 0
+        UIView.animate(withDuration: 0.2) { [weak self] in
+            guard let self else { return }
+            
+            previewOfPosterImageView.layer.masksToBounds = true
+            previewOfPosterImageView.layer.borderWidth = 8
+            previewOfPosterImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+            
+            //MARK: - УКОРОТИТЬ КОД ВИБРАЦИИ
+            if isCorrect {
+                let tapticGenerator = UINotificationFeedbackGenerator()
+                tapticGenerator.notificationOccurred(.success)
+            } else {
+                let tapticGenerator = UINotificationFeedbackGenerator()
+                tapticGenerator.notificationOccurred(.error)
             }
             
-            self.buttonsStackView.isUserInteractionEnabled = true
+            /* либо так, либо чуть поменять, но в общем и целом чет типо того. Можно проверить в верхнем if или рядом с ним кинуть переменную, а тернарный закинуть в анимэйт
+             let tapticGenerator = UINotificationFeedbackGenerator()
+             
+             tapticGenerator.notificationOccurred = isCorrect ? .success : .error
+             */
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self else { return }
+            UIView.animate(withDuration: 0.2) { [weak self] in
+                guard let self else { return }
+                
+                showNextQuestionOrResults()
+                previewOfPosterImageView.layer.borderWidth = 0
+            }
+            
+            buttonsStackView.isUserInteractionEnabled = true
         }
     }
     
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questions.count - 1 {
+        if currentQuestionIndex == questionsAmount - 1 {
             let quizResults = QuizResultsModel(
                 title: "Этот раунд окончен!",
-                text: "Ваш результат: \(correctAnswers)/\(questions.count)",
+                text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
                 buttonText: "Сыграть ещё раз")
             
             showQuizResults(quiz: quizResults)
         } else {
             currentQuestionIndex += 1
             
-            let nextQuestion = questions[currentQuestionIndex]
-            let viewModel = convert(model: nextQuestion)
-            
-            show(quiz: viewModel)
+            self.questionFactory?.requestNextQuestion()
+            guard let currentQuestion else { return }
+            let currentQuestionConverted = convert(model: currentQuestion)
+                
+            show(quiz: currentQuestionConverted)
+            }
         }
-    }
     
     private func showQuizResults(quiz result: QuizResultsModel) {
         let alert = UIAlertController(title: result.title,
                                       message: result.text,
                                       preferredStyle: .alert)
         
-        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
+        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
+            guard let self else { return }
+            currentQuestionIndex = 0
+            correctAnswers = 0
             
-            self.displayCurrentQuestion()
+            displayCurrentQuestion()
         }
         
         alert.addAction(action)
-        self.present(alert, animated: true, completion: nil)
+        present(alert, animated: true, completion: nil)
     }
     
     private func processAnswer(_ givenAnswer: Bool) {
-        let currentQuestion = questions[currentQuestionIndex]
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion?.correctAnswer)
     }
     
     //MARK: - Actions
