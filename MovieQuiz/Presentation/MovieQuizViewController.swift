@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate, StatisticServiceDelegate {
     
     //MARK: - Properties
     
@@ -16,6 +16,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var questionsAmount = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
+    private var alertPresenter: AlertPresenterProtocol?
+    private var statisticService: StatisticServiceProtocol?
     
     //MARK: - Lifecycle
     
@@ -26,8 +28,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory.delegate = self
         self.questionFactory = questionFactory
         
+        let alertPresenter = AlertPresenter()
+        alertPresenter.delegate = self
+        self.alertPresenter = alertPresenter
+        
+        let statisticService = StatisticService()
+        statisticService.delegate = self
+        self.statisticService = statisticService
+        
         questionFactory.requestNextQuestion()
-        displayCurrentQuestion()
     }
     
     //MARK: - QuestionFactoryDelegate
@@ -44,35 +53,65 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    //MARK: - AlertPresenterDelegate
+    
+    func didUserTapAlertButton() {
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        
+        self.questionFactory?.requestNextQuestion()
+    }
+    
+    
+    //MARK: - StatisticsServiceDelegate
+    
+    func didReceiveStoredData(_ bestGame: GameResultModel?) {
+        guard let bestGame else { return }
+        
+        let alertMessage = """
+                            Ваш результат: \(correctAnswers)/\(questionsAmount)
+                            Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
+                            Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
+                            Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0.0))% 
+                        """
+        
+        let quizResults = AlertModel(
+            title: "Этот раунд окончен!",
+            message: alertMessage,
+            buttonText: "Сыграть ещё раз",
+            completion: {})
+        
+        self.alertPresenter?.showAlertWithResults(quiz: quizResults, on: self)
+    }
+    
     // MARK: - Setup Methods
     
     private func convert(model: QuizQuestion) -> QuizStepModel {
-        let questionStep = QuizStepModel(
+        return QuizStepModel(
             image: UIImage(named: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return questionStep
     }
     
     private func show(quiz step: QuizStepModel) {
-        previewOfPosterImageView.image = step.image
         questionLabel.text = step.question
         counterOfQuestionLabel.text = step.questionNumber
-    }
-    
-    private func displayCurrentQuestion() {
-        //if let firstQuestion = questionFactory.requestNextQuestion() {
-        //self.currentQuestion = firstQuestion
-        guard let currentQuestion else { return }
-        let currentQuestionConverted = convert(model: currentQuestion)
         
-        show(quiz: currentQuestionConverted)
+        UIView.transition(with: previewOfPosterImageView,
+                          duration: 0.3,
+                          options: .transitionCrossDissolve,
+                          animations: { self.previewOfPosterImageView.image = step.image },
+                          completion: nil)
     }
     
     private func showAnswerResult(isCorrect: Bool) {
+        let tapticGenerator = UINotificationFeedbackGenerator()
+        tapticGenerator.prepare()
+        
         if isCorrect {
             correctAnswers += 1
-        }
+            tapticGenerator.notificationOccurred(.success)
+        } else { tapticGenerator.notificationOccurred(.error) }
         
         buttonsStackView.isUserInteractionEnabled = false
         
@@ -82,30 +121,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             previewOfPosterImageView.layer.masksToBounds = true
             previewOfPosterImageView.layer.borderWidth = 8
             previewOfPosterImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-            
-            //MARK: - УКОРОТИТЬ КОД ВИБРАЦИИ
-            if isCorrect {
-                let tapticGenerator = UINotificationFeedbackGenerator()
-                tapticGenerator.notificationOccurred(.success)
-            } else {
-                let tapticGenerator = UINotificationFeedbackGenerator()
-                tapticGenerator.notificationOccurred(.error)
-            }
-            
-            /* либо так, либо чуть поменять, но в общем и целом чет типо того. Можно проверить в верхнем if или рядом с ним кинуть переменную, а тернарный закинуть в анимэйт
-             let tapticGenerator = UINotificationFeedbackGenerator()
-             
-             tapticGenerator.notificationOccurred = isCorrect ? .success : .error
-             */
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self else { return }
-            UIView.animate(withDuration: 0.2) { [weak self] in
-                guard let self else { return }
-                
-                showNextQuestionOrResults()
-                previewOfPosterImageView.layer.borderWidth = 0
+            UIView.animate(withDuration: 0.2) {
+                self.showNextQuestionOrResults()
+                self.previewOfPosterImageView.layer.borderWidth = 0
             }
             
             buttonsStackView.isUserInteractionEnabled = true
@@ -114,38 +136,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
-            let quizResults = QuizResultsModel(
-                title: "Этот раунд окончен!",
-                text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
-                buttonText: "Сыграть ещё раз")
-            
-            showQuizResults(quiz: quizResults)
+            self.statisticService?.store(correct: correctAnswers, total: questionsAmount)
         } else {
             currentQuestionIndex += 1
             
             self.questionFactory?.requestNextQuestion()
-            guard let currentQuestion else { return }
-            let currentQuestionConverted = convert(model: currentQuestion)
-                
-            show(quiz: currentQuestionConverted)
-            }
         }
-    
-    private func showQuizResults(quiz result: QuizResultsModel) {
-        let alert = UIAlertController(title: result.title,
-                                      message: result.text,
-                                      preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            guard let self else { return }
-            currentQuestionIndex = 0
-            correctAnswers = 0
-            
-            displayCurrentQuestion()
-        }
-        
-        alert.addAction(action)
-        present(alert, animated: true, completion: nil)
     }
     
     private func processAnswer(_ givenAnswer: Bool) {

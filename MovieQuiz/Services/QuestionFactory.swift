@@ -1,6 +1,8 @@
 import UIKit
 
 class QuestionFactory: QuestionFactoryProtocol {
+    //MARK: - Properties
+    
     weak var delegate: QuestionFactoryDelegate?
     
     private let questions: [QuizQuestion] = [
@@ -46,7 +48,9 @@ class QuestionFactory: QuestionFactoryProtocol {
             correctAnswer: true),
     ]
     
-    func requestNextQuestion() {
+    //MARK: - Setup Methods
+    
+    func requestNextQuestion() {//разобрать вопрос с шаффлом здорового человека
         guard let index = (0..<questions.count).randomElement() else {
             delegate?.didReceiveNextQuestion(question: nil)
             return

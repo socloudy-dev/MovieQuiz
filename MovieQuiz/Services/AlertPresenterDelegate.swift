@@ -1,6 +1,6 @@
 import Foundation
 
-protocol MovieQuizViewControllerDelegate: AnyObject {
-    func didUserFinishQuiz(model: AlertModel?)
+protocol AlertPresenterDelegate: AnyObject {
+    func didUserTapAlertButton()
 }
 
