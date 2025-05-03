@@ -1,14 +1,14 @@
 import UIKit
 
-class AlertPresenter: AlertPresenterProtocol {
+final class AlertPresenter: AlertPresenterProtocol {
     weak var delegate: AlertPresenterDelegate?
  
-    func showAlertWithResults(quiz result: AlertModel, on viewController: UIViewController) {
-        let alert = UIAlertController(title: result.title,
-                                      message: result.message,
+    func showAlert(from model: AlertModel, on viewController: UIViewController) {
+        let alert = UIAlertController(title: model.title,
+                                      message: model.message,
                                       preferredStyle: .alert)
         
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
+        let action = UIAlertAction(title: model.buttonText, style: .default) { [weak self] _ in
             guard let self else { return }
            
             self.delegate?.didUserTapAlertButton()
@@ -17,4 +17,5 @@ class AlertPresenter: AlertPresenterProtocol {
         alert.addAction(action)
         viewController.present(alert, animated: true, completion: nil)
     }
+    
 }

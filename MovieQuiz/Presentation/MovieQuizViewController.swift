@@ -10,6 +10,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     @IBOutlet private weak var questionLabel: UILabel!
     @IBOutlet private weak var previewOfPosterImageView: UIImageView!
     @IBOutlet private weak var counterOfQuestionLabel: UILabel!
+    @IBOutlet private weak var downloadContentActivity: UIActivityIndicatorView!
     
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
@@ -24,7 +25,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let questionFactory = QuestionFactory()
+        let questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         questionFactory.delegate = self
         self.questionFactory = questionFactory
         
@@ -36,7 +37,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         statisticService.delegate = self
         self.statisticService = statisticService
         
-        questionFactory.requestNextQuestion()
+        showActivityIndicator()
+        questionFactory.loadData()
     }
     
     //MARK: - QuestionFactoryDelegate
@@ -51,6 +53,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: currentQuestionConverted)
         }
+    }
+    
+    func didLoadDataFromServer() {
+        downloadContentActivity.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     //MARK: - AlertPresenterDelegate
@@ -81,14 +92,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             buttonText: "Сыграть ещё раз",
             completion: {})
         
-        self.alertPresenter?.showAlertWithResults(quiz: quizResults, on: self)
+        self.alertPresenter?.showAlert(from: quizResults, on: self)
     }
     
     // MARK: - Setup Methods
     
     private func convert(model: QuizQuestion) -> QuizStepModel {
         return QuizStepModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
@@ -148,6 +159,27 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         showAnswerResult(isCorrect: givenAnswer == currentQuestion?.correctAnswer)
     }
     
+    private func showActivityIndicator() {
+        downloadContentActivity.isHidden = false
+        downloadContentActivity.startAnimating()
+    }
+    
+    private func hideActivityIndicator() {
+        downloadContentActivity.stopAnimating()
+        downloadContentActivity.isHidden = true
+    }
+    
+    private func showNetworkError(message: String) {
+        hideActivityIndicator()
+        
+        let errorModel = AlertModel(
+            title: "Ошибка",
+            message: message,
+            buttonText: "Попробовать ещё раз",
+            completion: {})
+        
+        self.alertPresenter?.showAlert(from: errorModel, on: self)
+    }
     //MARK: - Actions
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
