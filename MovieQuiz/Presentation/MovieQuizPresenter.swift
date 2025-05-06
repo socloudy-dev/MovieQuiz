@@ -3,7 +3,7 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate, AlertPresenterDelegate, StatisticServiceDelegate {
     //MARK: - Properties
     
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     private var questionFactory: QuestionFactoryProtocol?
     private var statisticService: StatisticServiceProtocol?
     private var alertPresenter: AlertPresenterProtocol?
@@ -13,7 +13,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, AlertPresenterDelegate,
     private var correctAnswers = 0
     private var currentQuestion: QuizQuestion?
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
         alertPresenter = AlertPresenter(delegate: self)
@@ -70,7 +70,9 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, AlertPresenterDelegate,
             buttonText: "Сыграть ещё раз",
             completion: {})
         
-        alertPresenter?.showAlert(from: quizResults, on: viewController!)
+        if let viewController = viewController as? UIViewController {
+            alertPresenter?.showAlert(from: quizResults, on: viewController)
+        }
     }
     
     //MARK: - Setup Methods
@@ -95,7 +97,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, AlertPresenterDelegate,
         }
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepModel {
+    func convert(model: QuizQuestion) -> QuizStepModel {
         return QuizStepModel(
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
@@ -138,7 +140,9 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, AlertPresenterDelegate,
             buttonText: "Попробовать ещё раз",
             completion: {})
         
-        alertPresenter?.showAlert(from: errorModel, on: viewController!)
+        if let viewController = viewController as? UIViewController {
+            alertPresenter?.showAlert(from: errorModel, on: viewController)
+        }
     }
 }
 

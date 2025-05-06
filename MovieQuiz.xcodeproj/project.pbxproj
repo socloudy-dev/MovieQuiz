@@ -24,6 +24,7 @@
 		86AE82062D9D415C00D7A0DE /* QuizResultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AE82042D9D415000D7A0DE /* QuizResultsModel.swift */; };
 		86AE820A2DA68EAC00D7A0DE /* QuestionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AE82092DA68E9E00D7A0DE /* QuestionFactory.swift */; };
 		86BC1F602DCA37690009BA2E /* MovieQuizPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BC1F5F2DCA37680009BA2E /* MovieQuizPresenter.swift */; };
+		86BC1F622DCA9EA10009BA2E /* MovieQuizViewControllerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BC1F612DCA9E980009BA2E /* MovieQuizViewControllerProtocol.swift */; };
 		86EB6F622DC68DBF00F8B287 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB6F612DC68DBC00F8B287 /* NetworkClient.swift */; };
 		86EB6F642DC6938800F8B287 /* MostPopularMovies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB6F632DC6937C00F8B287 /* MostPopularMovies.swift */; };
 		86EB6F662DC6956300F8B287 /* MoviesLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB6F652DC6955D00F8B287 /* MoviesLoader.swift */; };
@@ -75,6 +76,7 @@
 		86AE82042D9D415000D7A0DE /* QuizResultsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizResultsModel.swift; sourceTree = "<group>"; };
 		86AE82092DA68E9E00D7A0DE /* QuestionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactory.swift; sourceTree = "<group>"; };
 		86BC1F5F2DCA37680009BA2E /* MovieQuizPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieQuizPresenter.swift; sourceTree = "<group>"; };
+		86BC1F612DCA9E980009BA2E /* MovieQuizViewControllerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieQuizViewControllerProtocol.swift; sourceTree = "<group>"; };
 		86EB6F612DC68DBC00F8B287 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
 		86EB6F632DC6937C00F8B287 /* MostPopularMovies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPopularMovies.swift; sourceTree = "<group>"; };
 		86EB6F652DC6955D00F8B287 /* MoviesLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesLoader.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 		8F4738322848DE2A005DF65E /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
+				86BC1F612DCA9E980009BA2E /* MovieQuizViewControllerProtocol.swift */,
 				86BC1F5F2DCA37680009BA2E /* MovieQuizPresenter.swift */,
 				869EFD652DB842E700D942F0 /* AlertPresenter.swift */,
 				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
@@ -406,6 +409,7 @@
 				869EFDDA2DBB956200D942F0 /* StatisticServiceProtocol.swift in Sources */,
 				86AE82032D9D414C00D7A0DE /* QuizQuestion.swift in Sources */,
 				869EFD6A2DB8465800D942F0 /* AlertPresenterDelegate.swift in Sources */,
+				86BC1F622DCA9EA10009BA2E /* MovieQuizViewControllerProtocol.swift in Sources */,
 				869EFDE02DC0B78300D942F0 /* StatisticServiceDelegate.swift in Sources */,
 				AD1ABAB42831907B00B3E448 /* SceneDelegate.swift in Sources */,
 				86AE82062D9D415C00D7A0DE /* QuizResultsModel.swift in Sources */,
@@ -456,7 +460,7 @@
 				DEVELOPMENT_TEAM = TV5Y3F772E;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = socloudy.MovieQuizUITests;
@@ -478,7 +482,7 @@
 				DEVELOPMENT_TEAM = TV5Y3F772E;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = socloudy.MovieQuizUITests;
@@ -501,7 +505,7 @@
 				DEVELOPMENT_TEAM = TV5Y3F772E;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = socloudy.MovieQuizTests;
@@ -526,7 +530,7 @@
 				DEVELOPMENT_TEAM = TV5Y3F772E;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = socloudy.MovieQuizTests;
