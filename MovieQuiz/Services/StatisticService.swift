@@ -8,6 +8,10 @@ final class StatisticService: StatisticServiceProtocol {
     
     private let storage: UserDefaults = .standard
     
+    init(delegate: StatisticServiceDelegate) {
+        self.delegate = delegate
+    }
+    
     //MARK: - StatisticKeys
     
     private enum StatisticKeys: String {
@@ -73,6 +77,6 @@ final class StatisticService: StatisticServiceProtocol {
         totalAnswers += amount
         
         if currentGame.isBetterThan(bestGame) { bestGame = currentGame }
-        delegate?.didReceiveStoredData(bestGame)
+        delegate?.didReceiveStoredData()
     }
 }
