@@ -1,8 +1,14 @@
 import UIKit
 
 final class MoviQuizPresenter {
+    //MARK: - Properties
+    
     let questionsAmount = 10
     private var currentQuestionIndex = 0
+    var currentQuestion: QuizQuestion?
+    weak var viewController: MovieQuizViewController?
+    
+    //MARK: - Setup Methods
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -22,6 +28,11 @@ final class MoviQuizPresenter {
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
+    
+    func processAnswer(_ givenAnswer: Bool) {
+        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion?.correctAnswer)
+    }
+
     
 }
 

@@ -4,8 +4,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     //MARK: - Properties
     
-    @IBOutlet private weak var yesButton: UIButton!
-    @IBOutlet private weak var noButton: UIButton!
     @IBOutlet private weak var buttonsStackView: UIStackView!
     @IBOutlet private weak var questionLabel: UILabel!
     @IBOutlet private weak var previewOfPosterImageView: UIImageView!
@@ -36,6 +34,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         let statisticService = StatisticService()
         statisticService.delegate = self
         self.statisticService = statisticService
+        
+        presenter.viewController = self
         
         showActivityIndicator()
         questionFactory.loadData()
@@ -108,7 +108,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
                           completion: nil)
     }
     
-    private func showAnswerResult(isCorrect: Bool) {
+    func showAnswerResult(isCorrect: Bool) {
         let tapticGenerator = UINotificationFeedbackGenerator()
         tapticGenerator.prepare()
         
@@ -148,10 +148,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
     }
     
-    private func processAnswer(_ givenAnswer: Bool) {
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion?.correctAnswer)
-    }
-    
     private func showActivityIndicator() {
         downloadContentActivity.isHidden = false
         downloadContentActivity.startAnimating()
@@ -176,10 +172,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     //MARK: - Actions
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        processAnswer(false)
+        presenter.processAnswer(false)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        processAnswer(true)
+        presenter.processAnswer(true)
     }
 }
