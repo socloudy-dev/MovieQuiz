@@ -12,11 +12,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     private var correctAnswers = 0
     private var questionFactory: QuestionFactoryProtocol?
-    private var currentQuestion: QuizQuestion?
     private var alertPresenter: AlertPresenterProtocol?
     private var statisticService: StatisticServiceProtocol?
     
-    private var presenter = MoviQuizPresenter()
+    private var presenter = MovieQuizPresenter()
     
     //MARK: - Lifecycle
     
@@ -44,15 +43,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     //MARK: - QuestionFactoryDelegate
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question else {
-            return
-        }
-        
-        currentQuestion = question
-        let currentQuestionConverted = presenter.convert(model: question)
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: currentQuestionConverted)
-        }
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     func didLoadDataFromServer() {
@@ -97,7 +88,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     // MARK: - Setup Methods
     
-    private func show(quiz step: QuizStepModel) {
+    func show(quiz step: QuizStepModel) {
         questionLabel.text = step.question
         counterOfQuestionLabel.text = step.questionNumber
         
@@ -129,8 +120,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self else { return }
+            
+            self.presenter.correctAnswers = self.correctAnswers
+            self.presenter.questionFactory = self.questionFactory
+            self.presenter.statisticService = self.statisticService
+            
             UIView.animate(withDuration: 0.2) {
-                self.showNextQuestionOrResults()
+                self.presenter.showNextQuestionOrResults()
                 self.previewOfPosterImageView.layer.borderWidth = 0
             }
             
@@ -138,22 +134,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
     }
     
-    private func showNextQuestionOrResults() {
-        if presenter.isLastQuestion() {
-            self.statisticService?.store(correct: correctAnswers, total: presenter.questionsAmount)
-        } else {
-            presenter.switchToNextQuestion()
-            
-            self.questionFactory?.requestNextQuestion()
-        }
-    }
-    
-    private func showActivityIndicator() {
+    func showActivityIndicator() {
         downloadContentActivity.isHidden = false
         downloadContentActivity.startAnimating()
     }
     
-    private func hideActivityIndicator() {
+    func hideActivityIndicator() {
         downloadContentActivity.stopAnimating()
         downloadContentActivity.isHidden = true
     }
@@ -169,6 +155,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         
         self.alertPresenter?.showAlert(from: errorModel, on: self)
     }
+    
     //MARK: - Actions
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {

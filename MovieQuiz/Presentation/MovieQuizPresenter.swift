@@ -1,12 +1,16 @@
 import UIKit
 
-final class MoviQuizPresenter {
+final class MovieQuizPresenter {
     //MARK: - Properties
+    
+    weak var viewController: MovieQuizViewController?
+    var questionFactory: QuestionFactoryProtocol?
+    var statisticService: StatisticServiceProtocol?
     
     let questionsAmount = 10
     private var currentQuestionIndex = 0
+    var correctAnswers = 0
     var currentQuestion: QuizQuestion?
-    weak var viewController: MovieQuizViewController?
     
     //MARK: - Setup Methods
     
@@ -33,6 +37,27 @@ final class MoviQuizPresenter {
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion?.correctAnswer)
     }
 
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question else {
+            return
+        }
+        
+        currentQuestion = question
+        let currentQuestionConverted = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.show(quiz: currentQuestionConverted)
+        }
+    }
+    
+    func showNextQuestionOrResults() {
+        if isLastQuestion() {
+            self.statisticService?.store(correct: correctAnswers, total: questionsAmount)
+        } else {
+            self.switchToNextQuestion()
+            
+            questionFactory?.requestNextQuestion()
+        }
+    }
     
 }
 
