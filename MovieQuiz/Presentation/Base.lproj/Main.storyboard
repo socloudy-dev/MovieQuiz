@@ -45,7 +45,7 @@
                                             </label>
                                         </subviews>
                                     </stackView>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="249" verticalHuggingPriority="249" image="LaunchScreen" translatesAutoresizingMaskIntoConstraints="NO" id="BxE-Kf-zIe" userLabel="Preview Image">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="249" verticalHuggingPriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="BxE-Kf-zIe" userLabel="Preview Image">
                                         <rect key="frame" x="0.0" y="26.666666666666686" width="353" height="529.33333333333326"/>
                                         <color key="backgroundColor" name="YP White"/>
                                         <constraints>
@@ -109,19 +109,25 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="eNp-Pm-0hr">
+                                <rect key="frame" x="186.66666666666666" y="416" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <viewLayoutGuide key="safeArea" id="NdX-n6-PjA"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
-                            <constraint firstItem="NVI-Xx-Sfh" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="7Hq-iN-u2z"/>
-                            <constraint firstAttribute="trailing" secondItem="NVI-Xx-Sfh" secondAttribute="trailing" constant="20" id="8Ww-dI-rQP"/>
-                            <constraint firstItem="NVI-Xx-Sfh" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="A3s-eG-sr9"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="NVI-Xx-Sfh" secondAttribute="bottom" id="eQ6-hQ-59X"/>
+                            <constraint firstItem="NVI-Xx-Sfh" firstAttribute="top" secondItem="NdX-n6-PjA" secondAttribute="top" constant="10" id="7Hq-iN-u2z"/>
+                            <constraint firstItem="eNp-Pm-0hr" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="7RP-iI-6j8"/>
+                            <constraint firstItem="NdX-n6-PjA" firstAttribute="trailing" secondItem="NVI-Xx-Sfh" secondAttribute="trailing" constant="20" id="8Ww-dI-rQP"/>
+                            <constraint firstItem="NVI-Xx-Sfh" firstAttribute="leading" secondItem="NdX-n6-PjA" secondAttribute="leading" constant="20" id="A3s-eG-sr9"/>
+                            <constraint firstItem="eNp-Pm-0hr" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Juw-ym-iCO"/>
+                            <constraint firstItem="NdX-n6-PjA" firstAttribute="bottom" secondItem="NVI-Xx-Sfh" secondAttribute="bottom" id="eQ6-hQ-59X"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="buttonsStackView" destination="zsM-tV-wFE" id="2yl-6W-r2f"/>
                         <outlet property="counterOfQuestionLabel" destination="doN-j3-7Nb" id="pRq-So-PHq"/>
+                        <outlet property="downloadContentActivity" destination="eNp-Pm-0hr" id="g6z-Sb-cvu"/>
                         <outlet property="noButton" destination="gBu-xy-Njy" id="ylh-bw-tLB"/>
                         <outlet property="previewOfPosterImageView" destination="BxE-Kf-zIe" id="yIX-RO-jkp"/>
                         <outlet property="questionLabel" destination="OVn-Ix-A2O" id="gMJ-1d-sbW"/>
@@ -130,11 +136,10 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-55.909090909090914" y="55.230125523012553"/>
+            <point key="canvasLocation" x="-57.251908396946561" y="54.929577464788736"/>
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchScreen" width="1125" height="2436"/>
         <namedColor name="YP Black">
             <color red="0.10196078431372549" green="0.10588235294117647" blue="0.13333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
