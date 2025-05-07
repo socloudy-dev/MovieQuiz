@@ -111,6 +111,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, AlertPresenterDelegate,
         viewController?.tapticAnswer(isCorrectAnswer: isCorrectAnswer)
         viewController?.lockAnswerButtons()
         viewController?.highlightImageBorder(isCorrectAnswer: isCorrectAnswer)
+        isCorrectAnswer ? viewController?.animateSuccess() : viewController?.animateError()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self else { return }

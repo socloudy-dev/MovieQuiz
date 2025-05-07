@@ -13,4 +13,7 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     
     func showActivityIndicator()
     func hideActivityIndicator()
+    
+    func animateSuccess()
+    func animateError()
 }

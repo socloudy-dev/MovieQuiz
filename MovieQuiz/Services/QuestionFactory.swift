@@ -74,6 +74,13 @@ final class QuestionFactory: QuestionFactoryProtocol {
         }
     }
     
+    private func generateRandomThresholdRating(_ movieRating: Float) -> Float {
+        let randomOffset = Float.random(in: -1.5...1.5)
+        let generatedRating = movieRating + randomOffset
+        let generatedRatingRounded = (generatedRating * 10).rounded() / 10
+        
+        return generatedRatingRounded
+    }
     
     func requestNextQuestion() {
         DispatchQueue.global().async { [weak self] in
@@ -90,10 +97,13 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 print("Failed to load image")
             }
             
-            let rating = Float(movie.rating) ?? 0
+            let movieRating = Float(movie.rating) ?? 0
+            let generatedRating = generateRandomThresholdRating(movieRating)
             
-            let text = "Рейтинг этого фильма больше чем 7?"
-            let correctAnswer = rating > 7
+            
+            
+            let text = "Рейтинг этого фильма больше чем \(generatedRating)?"
+            let correctAnswer = movieRating > generatedRating
             
             let question = QuizQuestion(image: imageData,
                                         text: text,

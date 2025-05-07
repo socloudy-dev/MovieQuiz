@@ -54,6 +54,23 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         }
     }
     
+    func animateError() {
+        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animation.timingFunction = CAMediaTimingFunction(name: .linear)
+        animation.duration = 0.3
+        animation.values = [-8, 8, -6, 6, -4, 4, -2, 2, 0]
+        previewOfPosterImageView.layer.add(animation, forKey: "shake")
+    }
+
+    func animateSuccess() {
+        UIView.animate(withDuration: 0.15,
+                       animations: {
+                           self.previewOfPosterImageView.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+                       }, completion: { _ in
+                           UIView.animate(withDuration: 0.15) { self.previewOfPosterImageView.transform = .identity }
+                       })
+    }
+
     func clearImageBorder() {
         self.previewOfPosterImageView.layer.borderWidth = 0
     }
